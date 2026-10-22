@@ -5,5 +5,5 @@ window.DE_CONFIG = {
 
   // Optioneel: Google PageSpeed API-sleutel voor de website-check (stap 7 van de handleiding).
   // Leeg laten werkt ook, maar dan kan Google het aantal checks per dag beperken.
-  PSI_KEY: ''
+  PSI_KEY: 'AIzaSyAFmM2-e0L2cpUxDRgaNPzlH80AF3wN_3s'
 };
