@@ -128,7 +128,11 @@
           return j;
         });
       })
-      .then(function (j) { verwerk(j, domein); })
+      .then(function (j) {
+        verwerk(j, domein);
+        // Geslaagde check meetellen in de live teller (alleen +1, geen adres of IP opgeslagen)
+        DE.send('check', {}).then(function () { if (DE.tellerPlusEen) DE.tellerPlusEen(); }).catch(function () {});
+      })
       .catch(function (err) {
         var msg = err && err.message === 'druk'
           ? 'Het is even erg druk met checks. Probeer het over een minuut opnieuw.'
