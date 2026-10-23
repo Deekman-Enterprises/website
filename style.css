@@ -20,6 +20,9 @@ button:disabled { opacity: 0.6; cursor: wait !important; }
   font-size: 15px;
   line-height: 1.5;
 }
+/* Live teller: verborgen tot er een echt getal is */
+.teller-blok:not(.zichtbaar) { display: none !important; }
+[data-teller] { font-variant-numeric: tabular-nums; }
 .hp { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; overflow: hidden; }
 
 /* Menuknop, alleen op smalle schermen */

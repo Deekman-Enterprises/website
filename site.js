@@ -95,7 +95,59 @@
 
   window.DE = DE;
 
+  // Live teller: elementen met data-teller="checks" tonen het echte aantal uit de database.
+  // Het blok (.teller-blok) blijft verborgen tot er een getal is, en tot het aantal minstens TELLER_MIN is.
+  var TELLER_MIN = typeof C.TELLER_MIN === 'number' ? C.TELLER_MIN : 25;
+  var tellerWaarde = null;
+
+  function formatteer(n) {
+    return Math.round(n).toLocaleString('nl-NL');
+  }
+
+  function tel(el, tot) {
+    var stil = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var van = Number(el.dataset.getoond || 0);
+    if (stil || van === tot) { el.textContent = formatteer(tot); el.dataset.getoond = tot; return; }
+    var duur = van === 0 ? 1600 : 600, start = null;
+    function stap(t) {
+      if (!start) start = t;
+      var p = Math.min(1, (t - start) / duur);
+      var e = 1 - Math.pow(1 - p, 3);
+      el.textContent = formatteer(van + (tot - van) * e);
+      if (p < 1) requestAnimationFrame(stap); else el.dataset.getoond = tot;
+    }
+    requestAnimationFrame(stap);
+  }
+
+  function toonTeller(aantal) {
+    tellerWaarde = aantal;
+    var zichtbaar = aantal >= TELLER_MIN;
+    document.querySelectorAll('.teller-blok').forEach(function (b) { b.classList.toggle('zichtbaar', zichtbaar); });
+    if (!zichtbaar) return;
+    document.querySelectorAll('[data-teller]').forEach(function (el) {
+      if (!window.IntersectionObserver || el.dataset.getoond) { tel(el, aantal); return; }
+      el.textContent = '0';
+      var io = new IntersectionObserver(function (items) {
+        if (items.some(function (i) { return i.isIntersecting; })) { io.disconnect(); tel(el, tellerWaarde); }
+      }, { threshold: 0.4 });
+      io.observe(el);
+    });
+  }
+
+  DE.tellerPlusEen = function () {
+    if (tellerWaarde !== null) toonTeller(tellerWaarde + 1);
+  };
+
+  function laadTeller() {
+    if (!C.FORM_URL || !document.querySelector('[data-teller]')) return;
+    fetch(C.FORM_URL + '?teller=checks')
+      .then(function (r) { return r.json(); })
+      .then(function (j) { if (j && j.ok && typeof j.aantal === 'number') toonTeller(j.aantal); })
+      .catch(function () { /* geen teller tonen */ });
+  }
+
   // Menuknop op de telefoon
+  document.addEventListener('DOMContentLoaded', laadTeller);
   document.addEventListener('DOMContentLoaded', function () {
     var btn = document.querySelector('.menu-btn');
     var nav = document.getElementById('hoofdmenu');
