@@ -99,6 +99,26 @@
           DE.h('p', { style: 'margin: 4px 0 0; color: #4A5068; font-size: 15px; line-height: 1.5', text: pt.uitleg })));
     });
     fase('klaar', { domein: domein, score: String(totaal), samenvatting: samen, categorieen: delen.join(' · ') + ' (van de 100, gemeten op mobiel)' });
+
+    // Animatie: score telt op en de verbeterpunten verschijnen een voor een
+    if (document.documentElement.classList.contains('anim')) {
+      document.querySelectorAll('[data-list="punten"] li').forEach(function (li, i) {
+        li.classList.add('pop-in');
+        li.style.setProperty('--d', (0.15 + i * 0.09).toFixed(2) + 's');
+      });
+      var sc = document.querySelector('[data-bind="score"]');
+      if (sc && window.requestAnimationFrame) {
+        var start = null;
+        var stap = function (t) {
+          if (!start) start = t;
+          var p = Math.min(1, (t - start) / 1200);
+          sc.textContent = String(Math.round(totaal * (1 - Math.pow(1 - p, 3))));
+          if (p < 1) requestAnimationFrame(stap);
+        };
+        sc.textContent = '0';
+        requestAnimationFrame(stap);
+      }
+    }
   }
 
   form.addEventListener('submit', function (e) {
