@@ -20,6 +20,71 @@ button:disabled { opacity: 0.6; cursor: wait !important; }
   font-size: 15px;
   line-height: 1.5;
 }
+/* ===== Animaties (alleen als bezoeker geen "minder beweging" heeft ingesteld) ===== */
+.voortgang {
+  position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 100;
+  background: #F2C230; transform-origin: 0 50%; transform: scaleX(0); pointer-events: none;
+}
+@keyframes omhoog { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@keyframes van-rechts { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: none; } }
+@keyframes zweef { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes puls { 0% { stroke-dashoffset: var(--len); } 40%, 65% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: calc(var(--len) * -1); } }
+@keyframes stip { 0% { box-shadow: 0 0 0 0 rgba(20, 90, 50, 0.55); } 70%, 100% { box-shadow: 0 0 0 7px rgba(20, 90, 50, 0); } }
+@keyframes tik { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-4px); opacity: 1; } }
+@keyframes scan { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+
+@media (prefers-reduced-motion: no-preference) {
+  .anim .reveal {
+    opacity: 0; transform: translateY(28px);
+    transition: opacity 0.8s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+    transition-delay: var(--d, 0s);
+  }
+  .anim .reveal.in { opacity: 1; transform: none; }
+
+  .anim .hero-regel { display: inline-block; animation: omhoog 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: var(--d, 0s); }
+  .anim .van-rechts { animation: van-rechts 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: var(--d, 0s); }
+  .anim .zweef { animation: zweef 6s ease-in-out infinite; animation-delay: var(--d, 0s); }
+  .anim .zweef:hover { animation-play-state: paused; }
+  .anim .pop-in { animation: omhoog 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: var(--d, 0s); }
+
+  .anim .puls-lijn { stroke-dasharray: var(--len); stroke-dashoffset: var(--len); animation: puls 2.6s ease-in-out infinite; }
+
+  .anim .live-stip::before {
+    content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: currentColor; margin-right: 6px; vertical-align: 1px; animation: stip 1.8s ease-out infinite;
+  }
+
+  .anim .balk { transform: scaleY(0); transform-origin: 50% 100%; transition: transform 1s cubic-bezier(0.2, 0.7, 0.2, 1); transition-delay: var(--d, 0s); }
+  .anim .balk.groei { transform: none; }
+
+  .anim .bubbel { opacity: 0; transform: translateY(10px) scale(0.97); transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1); }
+  .anim .bubbel.in { opacity: 1; transform: none; }
+  .typt { display: inline-flex; gap: 4px; margin: 10px 0 0 32px; padding: 12px 14px; border-radius: 12px; background: #12172B; }
+  .typt i { width: 6px; height: 6px; border-radius: 50%; background: #F6F5F1; animation: tik 1s ease-in-out infinite; }
+  .typt i:nth-child(2) { animation-delay: 0.15s; }
+  .typt i:nth-child(3) { animation-delay: 0.3s; }
+
+  .anim .kaart-hover { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+  .anim .kaart-hover:hover { transform: translateY(-5px); box-shadow: 0 16px 34px rgba(18, 23, 43, 0.12); }
+
+  main a[style*="border-radius: 10px"], main button[type="submit"], header a[style*="background: #F2C230"] {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  }
+  main a[style*="border-radius: 10px"]:hover, main button[type="submit"]:hover, header a[style*="background: #F2C230"]:hover {
+    transform: translateY(-2px); box-shadow: 0 10px 22px rgba(18, 23, 43, 0.22);
+  }
+
+  /* Website-bouwer: voorbeeld verandert vloeiend van kleur en vorm */
+  [data-style^="p."] { transition: background-color 0.45s ease, color 0.45s ease, border-radius 0.45s ease; }
+
+  /* Website-check: scanbalk tijdens het meten */
+  [data-if="isBezig"] [role="status"] { position: relative; overflow: hidden; }
+  [data-if="isBezig"] [role="status"]::after {
+    content: ""; position: absolute; left: 0; bottom: 0; height: 4px; width: 40%;
+    background: #F2C230; border-radius: 4px; animation: scan 1.4s ease-in-out infinite;
+  }
+}
+
 /* Live teller: verborgen tot er een echt getal is */
 .teller-blok:not(.zichtbaar) { display: none !important; }
 [data-teller] { font-variant-numeric: tabular-nums; }
