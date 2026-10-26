@@ -146,6 +146,57 @@
       .catch(function () { /* geen teller tonen */ });
   }
 
+  // Inloggen: keuzevenster (zonder JavaScript gaat de knop gewoon naar inloggen.html)
+  var INLOG = [
+    { groep: 'Voor bedrijven', app: 'Paginapuls', tekst: 'Bekijk hoe je website presteert', url: 'https://paginapuls.deekmanenterprises.com/', kleur: '#2B3A8C', lijn: '#F6F5F1',
+      icoon: '<path d="M3 12h4l3-8 4 16 3-8h4"></path>' },
+    { groep: 'Voor studenten en docenten', app: 'Leerpuls', tekst: 'Leren met je eigen lesstof en AI', url: 'https://leerpuls.deekmanenterprises.com/', kleur: '#F2C230', lijn: '#12172B',
+      icoon: '<path d="M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"></path><path d="M8 7h7"></path>' },
+    { groep: 'Voor werknemers', app: 'Werknemersportaal', tekst: 'Je taken, websites en team', url: 'https://app.deekmanenterprises.com/', kleur: '#12172B', lijn: '#F2C230',
+      icoon: '<rect x="3" y="7" width="18" height="13" rx="2"></rect><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>' }
+  ];
+  var inlogVenster = null, inlogKnop = null;
+
+  function maakInlogVenster() {
+    var d = document.createElement('dialog');
+    d.className = 'inlog-venster';
+    d.setAttribute('aria-labelledby', 'inlog-titel');
+    var html = '<div class="inlog-kop"><div><p class="inlog-label">Inloggen</p>' +
+      '<h2 id="inlog-titel">Waar wil je inloggen?</h2></div>' +
+      '<button type="button" class="inlog-sluit" aria-label="Sluiten"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>' +
+      '<ul class="inlog-lijst">';
+    INLOG.forEach(function (o) {
+      html += '<li><a class="inlog-optie" href="' + o.url + '">' +
+        '<span class="inlog-icoon" style="background:' + o.kleur + '"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="' + o.lijn + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + o.icoon + '</svg></span>' +
+        '<span class="inlog-tekst"><span class="inlog-groep">' + o.groep + '</span><span class="inlog-app">' + o.app + '</span><span class="inlog-uitleg">' + o.tekst + '</span></span>' +
+        '<span class="inlog-pijl" aria-hidden="true">→</span></a></li>';
+    });
+    html += '</ul><p class="inlog-voet">Nog geen account? <a href="contact.html">Neem contact op</a>.</p>';
+    d.innerHTML = html;
+    document.body.appendChild(d);
+    d.querySelector('.inlog-sluit').addEventListener('click', function () { d.close(); });
+    // Klik naast het venster sluit het
+    d.addEventListener('click', function (e) { if (e.target === d) d.close(); });
+    d.addEventListener('close', function () { if (inlogKnop) inlogKnop.focus(); });
+    return d;
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('a[href="inloggen.html"]').forEach(function (a) {
+      if (!window.HTMLDialogElement) return;
+      a.setAttribute('aria-haspopup', 'dialog');
+      a.addEventListener('click', function (e) {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
+        e.preventDefault();
+        inlogKnop = a;
+        if (!inlogVenster) inlogVenster = maakInlogVenster();
+        inlogVenster.showModal();
+        var eerste = inlogVenster.querySelector('.inlog-optie');
+        if (eerste) eerste.focus();
+      });
+    });
+  });
+
   // Menuknop op de telefoon
   document.addEventListener('DOMContentLoaded', laadTeller);
   document.addEventListener('DOMContentLoaded', function () {

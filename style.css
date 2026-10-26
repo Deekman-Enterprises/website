@@ -2,6 +2,7 @@
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: #F6F5F1; }
+main { overflow-x: clip; } /* animaties die van opzij inschuiven geven nooit een horizontale scrollbalk */
 img { max-width: 100%; height: auto; }
 a { color: #12172B; }
 a:hover { color: #2B3A8C; }
@@ -20,6 +21,50 @@ button:disabled { opacity: 0.6; cursor: wait !important; }
   font-size: 15px;
   line-height: 1.5;
 }
+/* ===== Inloggen: keuzevenster ===== */
+.inlog-venster {
+  width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow: auto;
+  padding: 28px; border: 0; border-radius: 22px; background: #F6F5F1; color: #12172B;
+  font-family: Inter, system-ui, sans-serif; box-shadow: 0 30px 80px rgba(12, 16, 32, 0.45);
+}
+.inlog-venster::backdrop { background: rgba(12, 16, 32, 0.6); backdrop-filter: blur(3px); }
+.inlog-kop { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.inlog-label { margin: 0 0 6px; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #2B3A8C; }
+.inlog-kop h2 { margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 30px; line-height: 1.1; }
+.inlog-sluit {
+  flex-shrink: 0; width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid #D6D3C8; border-radius: 12px; background: #FFFFFF; color: #12172B; cursor: pointer;
+}
+.inlog-sluit:hover { background: #ECEAE3; }
+.inlog-lijst { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.inlog-optie {
+  display: flex; align-items: center; gap: 16px; padding: 18px; border-radius: 16px;
+  background: #FFFFFF; border: 1px solid #E3E1D9; text-decoration: none; color: #12172B;
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+.inlog-optie:hover, .inlog-optie:focus-visible { border-color: #12172B; color: #12172B; }
+.inlog-icoon { width: 52px; height: 52px; flex-shrink: 0; border-radius: 14px; display: flex; align-items: center; justify-content: center; }
+.inlog-tekst { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.inlog-groep { font-size: 13px; font-weight: 600; color: #2B3A8C; }
+.inlog-app { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 21px; line-height: 1.2; }
+.inlog-uitleg { font-size: 14px; color: #4A5068; }
+.inlog-pijl { font-size: 20px; font-weight: 600; transition: transform 0.2s ease; }
+.inlog-voet { margin: 18px 0 0; font-size: 14px; color: #4A5068; }
+@media (prefers-reduced-motion: no-preference) {
+  .inlog-venster[open] { animation: venster-in 0.28s cubic-bezier(0.2, 0.7, 0.2, 1); }
+  .inlog-venster[open]::backdrop { animation: achtergrond-in 0.28s ease; }
+  .inlog-optie:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(18, 23, 43, 0.10); }
+  .inlog-optie:hover .inlog-pijl { transform: translateX(4px); }
+}
+@keyframes venster-in { from { opacity: 0; transform: translateY(16px) scale(0.98); } to { opacity: 1; transform: none; } }
+@keyframes achtergrond-in { from { opacity: 0; } to { opacity: 1; } }
+@media (max-width: 480px) {
+  .inlog-venster { padding: 20px; }
+  .inlog-kop h2 { font-size: 25px; }
+  .inlog-optie { padding: 14px; gap: 12px; }
+  .inlog-icoon { width: 44px; height: 44px; }
+}
+
 /* ===== Animaties (alleen als bezoeker geen "minder beweging" heeft ingesteld) ===== */
 .voortgang {
   position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 100;
