@@ -1,0 +1,8 @@
+UPDATE: LUX Portaal als maatwerk voor LUX Media (vervangt de vorige update-lux-portaal.zip)
+
+GitHub -> repo "website" -> hoofdmap -> "Add file" -> "Upload files"
+Sleep deze 4 bestanden erin:
+  index.html, apps.html, inloggen.html, site.js
+-> Commit changes
+
+LET OP: upload config.js NIET.
