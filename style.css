@@ -119,6 +119,10 @@ button:disabled { opacity: 0.6; cursor: wait !important; }
     transform: translateY(-2px); box-shadow: 0 10px 22px rgba(18, 23, 43, 0.22);
   }
 
+  /* Websites die we bouwden: bij hover scrolt de schermafbeelding door de hele site */
+  .site-scroll img { transition: object-position 7s ease-in-out; }
+  .site-voorbeeld:hover .site-scroll img, .site-voorbeeld:focus-visible .site-scroll img { object-position: 50% 100% !important; }
+
   /* Website-bouwer: voorbeeld verandert vloeiend van kleur en vorm */
   [data-style^="p."] { transition: background-color 0.45s ease, color 0.45s ease, border-radius 0.45s ease; }
 
@@ -149,7 +153,14 @@ button:disabled { opacity: 0.6; cursor: wait !important; }
   color: #F6F5F1;
   cursor: pointer;
 }
-@media (max-width: 820px) {
+/* Middelgrote schermen: menu iets compacter zodat het op één regel past */
+@media (min-width: 1041px) and (max-width: 1240px) {
+  #hoofdmenu { gap: 0 !important; }
+  #hoofdmenu a { padding-left: 10px !important; padding-right: 10px !important; }
+  #hoofdmenu a[href="inloggen.html"], #hoofdmenu a[href="contact.html"] { margin-left: 6px !important; }
+  header img { height: 42px !important; }
+}
+@media (max-width: 1040px) {
   .menu-btn { display: inline-flex; align-items: center; }
   header img { height: 40px !important; }
   #hoofdmenu { display: none !important; width: 100%; flex-direction: column; align-items: stretch !important; }
