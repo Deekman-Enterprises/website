@@ -154,16 +154,22 @@ button:disabled { opacity: 0.6; cursor: wait !important; }
   cursor: pointer;
 }
 /* Middelgrote schermen: menu iets compacter zodat het op één regel past */
-@media (min-width: 1041px) and (max-width: 1240px) {
+@media (min-width: 1161px) {
   #hoofdmenu { gap: 0 !important; }
   #hoofdmenu a { padding-left: 10px !important; padding-right: 10px !important; }
   #hoofdmenu a[href="inloggen.html"], #hoofdmenu a[href="contact.html"] { margin-left: 6px !important; }
   header img { height: 42px !important; }
 }
-@media (max-width: 1040px) {
+@media (max-width: 1160px) {
   .menu-btn { display: inline-flex; align-items: center; }
   header img { height: 40px !important; }
   #hoofdmenu { display: none !important; width: 100%; flex-direction: column; align-items: stretch !important; }
   #hoofdmenu.open { display: flex !important; }
   #hoofdmenu a { margin-left: 0 !important; }
 }
+
+/* Voor bedrijven: veelgestelde vragen (uitklapbaar) */
+.vraag summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 16px; min-height: 28px; }
+.vraag summary::-webkit-details-marker { display: none; }
+.vraag summary::after { content: "+"; flex-shrink: 0; font-weight: 600; font-size: 22px; line-height: 1; color: #2B3A8C; }
+.vraag[open] summary::after { content: "–"; }
