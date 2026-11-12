@@ -1,8 +1,16 @@
-UPDATE: LUX Portaal als maatwerk voor LUX Media (vervangt de vorige update-lux-portaal.zip)
+UPDATE: bankrekening toegevoegd (12 november 2026)
 
-GitHub -> repo "website" -> hoofdmap -> "Add file" -> "Upload files"
-Sleep deze 4 bestanden erin:
-  index.html, apps.html, inloggen.html, site.js
--> Commit changes
+WAT IS ER VERANDERD
+- IBAN NL95 RABO 0198 8934 50 t.n.v. Deekman Enterprise staat onderaan
+  elke pagina, onder je KvK-nummer en btw-id.
+- Op de contactpagina staat het onder "Btw-id".
 
-LET OP: upload config.js NIET.
+HOE ZET JE HET LIVE
+1. Ga naar github.com/Deekman-Enterprises/website
+2. Klik op "Add file" > "Upload files".
+3. Sleep ALLE html-bestanden uit deze map erin (niet deze LEESMIJ.txt).
+4. Klik op "Commit changes". Na 1-2 minuten live; ververs met Cmd+Shift+R.
+
+LET OP
+- config.js zit er bewust niet bij; laat die staan.
+- Deze update bevat ook het btw-id, het KvK-nummer en "Voor bedrijven".
