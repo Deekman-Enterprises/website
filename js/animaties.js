@@ -158,3 +158,183 @@
     k.classList.add('kaart-hover');
   });
 })();
+
+/* Deekman Enterprises — bewegende achtergronden voor de homepage-hero.
+   Welke er draait, staat in data-hero op de hero-sectie: "netwerk" of "patroon".
+   De logo-intro draait als de sectie ook data-intro heeft.
+   Met "minder beweging" aan blijft alles stil. */
+(function () {
+  var stil = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hero = document.querySelector('[data-hero]');
+  var DE = 'M92.32 337.20V174.80H163.31Q189.76 174.80 209.71 184.89Q229.66 194.98 240.80 213.31Q251.94 231.64 251.94 256.00Q251.94 280.36 240.80 298.68Q229.66 317.01 209.71 327.10Q189.76 337.20 163.31 337.20ZM122.48 311.68H161.92Q180.02 311.68 193.47 304.83Q206.93 297.99 214.24 285.46Q221.54 272.93 221.54 256.00Q221.54 239.06 214.24 226.53Q206.93 214.00 193.47 207.16Q180.02 200.32 161.92 200.32H122.48ZM297.87 337.20V174.80H416.42V200.08H328.03V242.31H406.45V267.13H328.03V311.91H419.67V337.20Z';
+
+  function maakCanvas() {
+    var c = document.createElement('canvas');
+    c.className = 'hero-canvas';
+    c.setAttribute('aria-hidden', 'true');
+    hero.insertBefore(c, hero.firstChild);
+    return c;
+  }
+
+  function start(teken) {
+    var c = maakCanvas(), ctx = c.getContext('2d');
+    var w = 0, h = 0, dpr = 1, muis = { x: -9999, y: -9999, actief: false };
+    function maat() {
+      var r = hero.getBoundingClientRect();
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = r.width; h = r.height;
+      c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (teken.maat) teken.maat(w, h);
+    }
+    maat();
+    window.addEventListener('resize', maat);
+    hero.addEventListener('mousemove', function (e) {
+      var r = hero.getBoundingClientRect();
+      muis.x = e.clientX - r.left; muis.y = e.clientY - r.top; muis.actief = true;
+    });
+    hero.addEventListener('mouseleave', function () { muis.actief = false; muis.x = muis.y = -9999; });
+    var zichtbaar = true;
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (i) { zichtbaar = i[0].isIntersecting; }).observe(hero);
+    }
+    var t0 = performance.now();
+    function frame(nu) {
+      if (zichtbaar) {
+        ctx.clearRect(0, 0, w, h);
+        teken.frame(ctx, w, h, (nu - t0) / 1000, muis, stil);
+      }
+      if (!stil) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  /* ---------- Variant: zwevende gouden puntjes die een netwerk vormen ---------- */
+  function netwerk() {
+    var punten = [];
+    return {
+      maat: function (w, h) {
+        var n = Math.round(Math.min(110, (w * h) / 11000));
+        punten = [];
+        for (var i = 0; i < n; i++) {
+          punten.push({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - 0.5) * 0.35, vy: (Math.random() - 0.5) * 0.35, r: 1 + Math.random() * 1.6 });
+        }
+      },
+      frame: function (ctx, w, h, t, muis) {
+        var max = 130, i, j, p, q, dx, dy, d;
+        for (i = 0; i < punten.length; i++) {
+          p = punten[i];
+          if (muis.actief) {
+            dx = p.x - muis.x; dy = p.y - muis.y; d = Math.sqrt(dx * dx + dy * dy);
+            if (d < 140 && d > 0.1) { p.x += (dx / d) * (140 - d) * 0.02; p.y += (dy / d) * (140 - d) * 0.02; }
+          }
+          p.x += p.vx; p.y += p.vy;
+          if (p.x < -20) p.x = w + 20; if (p.x > w + 20) p.x = -20;
+          if (p.y < -20) p.y = h + 20; if (p.y > h + 20) p.y = -20;
+        }
+        ctx.lineWidth = 1;
+        for (i = 0; i < punten.length; i++) {
+          p = punten[i];
+          for (j = i + 1; j < punten.length; j++) {
+            q = punten[j]; dx = p.x - q.x; dy = p.y - q.y; d = dx * dx + dy * dy;
+            if (d < max * max) {
+              ctx.strokeStyle = 'rgba(242,194,48,' + (0.22 * (1 - Math.sqrt(d) / max)).toFixed(3) + ')';
+              ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+            }
+          }
+          if (muis.actief) {
+            dx = p.x - muis.x; dy = p.y - muis.y; d = Math.sqrt(dx * dx + dy * dy);
+            if (d < 200) {
+              ctx.strokeStyle = 'rgba(246,245,241,' + (0.35 * (1 - d / 200)).toFixed(3) + ')';
+              ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(muis.x, muis.y); ctx.stroke();
+            }
+          }
+        }
+        for (i = 0; i < punten.length; i++) {
+          p = punten[i];
+          ctx.fillStyle = 'rgba(242,194,48,' + (0.55 + 0.35 * Math.sin(t * 1.5 + i)).toFixed(3) + ')';
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+    };
+  }
+
+  /* ---------- Variant: patroon van kleine DE-logo's dat oplicht ---------- */
+  function patroon() {
+    var pad = window.Path2D ? new Path2D(DE) : null, stap = 120, maat = 26;
+    return {
+      frame: function (ctx, w, h, t, muis) {
+        if (!pad) return;
+        var schuif = (t * 8) % stap;
+        var golfX = ((t * 260) % (w + 900)) - 450; // lichtgolf die rustig van links naar rechts gaat
+        for (var rij = -1; rij * stap < h + stap; rij++) {
+          for (var kol = -1; kol * stap < w + stap; kol++) {
+            var x = kol * stap + (rij % 2 ? stap / 2 : 0) + schuif;
+            var y = rij * stap + schuif * 0.6;
+            var cx = x + maat / 2, cy = y + maat / 2;
+            var licht = 0;
+            if (muis.actief) {
+              var d = Math.sqrt((cx - muis.x) * (cx - muis.x) + (cy - muis.y) * (cy - muis.y));
+              licht = Math.max(licht, 1 - d / 220);
+            }
+            var g = 1 - Math.abs(cx - golfX - (cy * 0.35)) / 260;
+            licht = Math.max(licht, g * 0.35);
+            licht = Math.max(0, licht);
+            ctx.save();
+            ctx.translate(x, y);
+            var s = (maat / 330) * (1 + licht * 0.25);
+            ctx.scale(s, s);
+            ctx.translate(-92, -175);
+            if (licht > 0.02) {
+              ctx.fillStyle = 'rgba(242,194,48,' + (0.04 + licht * 0.45).toFixed(3) + ')';
+            } else {
+              ctx.fillStyle = 'rgba(246,245,241,0.04)';
+            }
+            ctx.fill(pad);
+            ctx.restore();
+          }
+        }
+      }
+    };
+  }
+
+  if (hero) {
+    var soort = hero.getAttribute('data-hero');
+    if (soort === 'netwerk') start(netwerk());
+    if (soort === 'patroon') start(patroon());
+  }
+
+  /* ---------- Variant: logo-intro bij het openen van de site ---------- */
+  if (hero && hero.hasAttribute('data-intro') && !stil) {
+    var gezien = false;
+    try { gezien = sessionStorage.getItem('de-intro') === '1'; sessionStorage.setItem('de-intro', '1'); } catch (e) {}
+    var doel = document.querySelector('header img');
+    if (!gezien && doel) {
+      var laag = document.createElement('div');
+      laag.className = 'intro-laag';
+      laag.setAttribute('aria-hidden', 'true');
+      laag.innerHTML = '<img class="intro-logo" src="' + doel.getAttribute('src') + '" alt="">';
+      document.body.appendChild(laag);
+      document.documentElement.classList.add('intro-bezig');
+      var logo = laag.firstChild;
+      var klaar = false;
+      function sluit() {
+        if (klaar) return; klaar = true;
+        logo.style.animation = 'none';
+        var a = logo.getBoundingClientRect(), b = doel.getBoundingClientRect();
+        var sx = b.width / a.width;
+        var tx = (b.left + b.width / 2) - (a.left + a.width / 2);
+        var ty = (b.top + b.height / 2) - (a.top + a.height / 2);
+        logo.style.transition = 'transform 0.9s cubic-bezier(0.7, 0, 0.2, 1)';
+        logo.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + sx + ')';
+        laag.classList.add('weg');
+        setTimeout(function () {
+          document.documentElement.classList.remove('intro-bezig');
+          laag.parentNode && laag.parentNode.removeChild(laag);
+        }, 1000);
+      }
+      laag.addEventListener('click', sluit);
+      setTimeout(sluit, 2300);
+    }
+  }
+})();
